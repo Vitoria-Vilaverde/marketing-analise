@@ -1,0 +1,52 @@
+## Estrutura do Projeto
+# 📂 marketing-data-analysis
+# ├── 📂 data  # Dados brutos e processados
+# ├── 📂 notebooks  # Jupyter Notebooks para análise
+# ├── 📂 scripts  # Scripts Python para ETL e automação
+# ├── 📂 dashboards  # Arquivos para Looker Studio ou Power BI
+# ├── README.md  # Documentação do projeto
+
+# Importação das bibliotecas
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from google.cloud import bigquery
+
+# Configuração inicial
+sns.set_style("whitegrid")
+
+# Função para carregar dados de BigQuery
+def carregar_dados(query, project_id):
+    client = bigquery.Client(project=project_id)
+    df = client.query(query).to_dataframe()
+    return df
+
+# Exemplo de consulta SQL no BigQuery
+QUERY = """
+SELECT campaign, medium, source, sessions, conversions
+FROM `projeto-marketing.analytics_data`
+LIMIT 1000
+"""
+
+# Substituir pelo ID do seu projeto no GCP
+PROJETO_ID = "seu-projeto-id"
+df = carregar_dados(QUERY, PROJETO_ID)
+
+# Visualização inicial dos dados
+df.head()
+
+# Estatísticas básicas
+df.describe()
+
+# Gráfico de conversões por campanha
+plt.figure(figsize=(12,6))
+sns.barplot(x='campaign', y='conversions', data=df, palette='viridis')
+plt.xticks(rotation=45)
+plt.title('Conversões por Campanha')
+plt.show()
+
+# Salvando relatório CSV
+df.to_csv("data/marketing_analysis.csv", index=False)
+
+print("Análise concluída! Dados salvos em 'data/marketing_analysis.csv'")
